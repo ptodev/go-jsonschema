@@ -131,10 +131,11 @@ func (g *Generator) DoFile(fileName string) error {
 		}
 	}
 
-	return g.addFile(fileName, schema)
+	return g.AddFile(fileName, schema)
 }
 
-func (g *Generator) addFile(fileName string, schema *schemas.Schema) error {
+// TODO: Find a clean way to load schema as an object instead of loading as a file.
+func (g *Generator) AddFile(fileName string, schema *schemas.Schema) error {
 	o, err := g.findOutputFileForSchemaID(schema.ID)
 	if err != nil {
 		return err
