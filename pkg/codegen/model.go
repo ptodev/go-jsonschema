@@ -263,6 +263,20 @@ func (t NamedType) Generate(out *Emitter) {
 	out.Printf(t.Decl.Name)
 }
 
+type DurationType struct{}
+
+func (t DurationType) GetName() string {
+	return "Duration"
+}
+
+func (t DurationType) IsNillable() bool {
+	return false
+}
+
+func (t DurationType) Generate(out *Emitter) {
+	out.Printf("time.Duration")
+}
+
 type PrimitiveType struct {
 	Type string
 }

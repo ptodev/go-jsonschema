@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sanity-io/litter"
+	"github.com/sosodev/duration"
 
 	"github.com/atombender/go-jsonschema/pkg/codegen"
 )
@@ -16,9 +17,15 @@ type validator interface {
 	desc() *validatorDesc
 }
 
+type packageImport struct {
+	qualifiedName string
+	alias         string
+}
+
 type validatorDesc struct {
 	hasError        bool
 	beforeUnmarshal bool
+	imports         []packageImport
 }
 
 var (
@@ -107,6 +114,48 @@ type defaultValidator struct {
 }
 
 func (v *defaultValidator) generate(out *codegen.Emitter, format string) {
+	_, ok := v.defaultValueType.(codegen.DurationType)
+	if v.defaultValueType != nil && ok {
+		defaultDurationISO8601, ok := v.defaultValue.(string)
+		if !ok {
+			//TODO: Make this an error
+			//TODO: Print type name?
+			panic("duration default value must be a string")
+		}
+		if defaultDurationISO8601 == "" {
+			//TODO: Make this an error
+			//TODO: Print type name?
+			panic("duration default value must not be an empty string")
+		}
+
+		duration, err := duration.Parse(defaultDurationISO8601)
+		if err != nil {
+			//TODO: Make this an error
+			//TODO: Print type name?
+			panic("could not convert duration from ISO8601 to Go format")
+		}
+
+		defaultValue := "defaultDuration"
+		goDurationStr := duration.ToTimeDuration().String()
+
+		out.Printlnf(`if v, ok := %s["%s"]; !ok || v == nil {`, varNameRawMap, v.jsonName)
+		out.Indent(1)
+		out.Printlnf("%s, err := time.ParseDuration(\"%s\")", defaultValue, goDurationStr)
+		out.Printlnf("if err != nil {")
+		out.Indent(1)
+		out.Printlnf("return fmt.Errorf(\"failed to parse the \\\"%s\\\" default value for field %s:%%w }\", err)", defaultDurationISO8601, v.fieldName)
+		//TODO: Which default value should we print? The ISO one or the Go one? Or both?
+		// out.Printlnf("return fmt.Errorf(\"failed to parse the \\\"%s\\\" default value for field %s:%%w }\", err)", goDurationStr, v.fieldName)
+		out.Indent(-1)
+		out.Printlnf("}")
+
+		out.Printlnf(`%s.%s = %s`, varNamePlainStruct, v.fieldName, defaultValue)
+		out.Indent(-1)
+		out.Printlnf("}")
+		// If "default" is set to "", then we shouldn't print anything.
+		return
+	}
+
 	defaultValue := v.dumpDefaultValue(out)
 
 	out.Printlnf(`if v, ok := %s["%s"]; !ok || v == nil {`, varNameRawMap, v.jsonName)
@@ -167,9 +216,21 @@ func (v *defaultValidator) tryDumpDefaultSlice(maxLineLen uint) (string, error) 
 }
 
 func (v *defaultValidator) desc() *validatorDesc {
+	var packages []packageImport
+	_, ok := v.defaultValueType.(codegen.DurationType)
+	if v.defaultValueType != nil && ok {
+		defaultDurationISO8601, ok := v.defaultValue.(string)
+		if ok && defaultDurationISO8601 != "" {
+			packages = []packageImport{
+				{qualifiedName: "fmt"},
+			}
+		}
+	}
+
 	return &validatorDesc{
 		hasError:        false,
 		beforeUnmarshal: false,
+		imports:         packages,
 	}
 }
 

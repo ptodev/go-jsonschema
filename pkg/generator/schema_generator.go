@@ -367,6 +367,10 @@ func (g *schemaGenerator) generateUnmarshaler(decl codegen.TypeDecl, validators 
 	}
 
 	for _, v := range validators {
+		for _, im := range v.desc().imports {
+			g.output.file.Package.AddImport(im.qualifiedName, im.alias)
+		}
+
 		if _, ok := v.(*anyOfValidator); ok {
 			g.output.file.Package.AddImport("errors", "")
 		}
@@ -462,6 +466,12 @@ func (g *schemaGenerator) generateType(t *schemas.Type, scope nameScope) (codege
 				g.output.file.Package.AddImport(imprt.QualifiedName, "")
 			}
 
+			return ncg, nil
+		}
+
+		//TODO: We should get the imports from an interface instead of casting.
+		if ncg, ok := cg.(codegen.DurationType); ok {
+			g.output.file.Package.AddImport("time", "")
 			return ncg, nil
 		}
 
@@ -831,6 +841,12 @@ func (g *schemaGenerator) generateTypeInline(t *schemas.Type, scope nameScope) (
 					g.output.file.Package.AddImport(imprt.QualifiedName, "")
 				}
 
+				return ncg, nil
+			}
+
+			//TODO: We should get the imports from an interface instead of casting.
+			if ncg, ok := cg.(codegen.DurationType); ok {
+				g.output.file.Package.AddImport("time", "")
 				return ncg, nil
 			}
 

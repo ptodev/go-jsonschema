@@ -28,6 +28,9 @@ func isPointerType(t Type) bool {
 	case *NamedType:
 		return isPointerType(x.Decl.Type)
 
+	// case *DurationType:
+	// 	return true
+
 	default:
 		return false
 	}
@@ -98,6 +101,9 @@ func PrimitiveTypeFromJSONSchemaType(jsType, format string, pointer bool) (Type,
 					Name: "SerializableTime",
 				},
 			}
+
+		case "duration":
+			t = DurationType{}
 
 		default:
 			t = PrimitiveType{"string"}
