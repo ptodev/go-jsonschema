@@ -7,3 +7,4 @@ bin/
 dist/
 vendor/
 go.work
+*.DS_Store
