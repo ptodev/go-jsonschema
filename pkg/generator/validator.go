@@ -291,7 +291,7 @@ func (v *numberValidator) generate(out *codegen.Emitter) {
 	}
 
 	if v.minimum != nil {
-		out.Printlnf(`if %s%s%s >= %f {`, checkPointer, pointerPrefix, value, *v.minimum)
+		out.Printlnf(`if !(%s%s%s >= %f) {`, checkPointer, pointerPrefix, value, *v.minimum)
 		out.Indent(1)
 		//TODO: How do we make the %d as precise as the Go float64?
 		// Currently it doesn't print all numbers after the decimal.
@@ -302,7 +302,7 @@ func (v *numberValidator) generate(out *codegen.Emitter) {
 	}
 
 	if v.maximum != nil {
-		out.Printlnf(`if %s%s%s <= %f {`, checkPointer, pointerPrefix, value, *v.maximum)
+		out.Printlnf(`if !(%s%s%s <= %f) {`, checkPointer, pointerPrefix, value, *v.maximum)
 		out.Indent(1)
 		out.Printlnf(`return fmt.Errorf("field %%s must be <= %%f", "%s", %f)`, fieldName, *v.maximum)
 		out.Indent(-1)
@@ -311,7 +311,7 @@ func (v *numberValidator) generate(out *codegen.Emitter) {
 
 	// The spec allows having both minimum and exclusiveMinimum.
 	if v.exclusiveMinimum != nil {
-		out.Printlnf(`if %s%s%s > %f {`, checkPointer, pointerPrefix, value, *v.exclusiveMinimum)
+		out.Printlnf(`if !(%s%s%s > %f) {`, checkPointer, pointerPrefix, value, *v.exclusiveMinimum)
 		out.Indent(1)
 		out.Printlnf(`return fmt.Errorf("field %%s must be > %%f", "%s", %f)`, fieldName, *v.exclusiveMinimum)
 		out.Indent(-1)
@@ -320,7 +320,7 @@ func (v *numberValidator) generate(out *codegen.Emitter) {
 
 	// The spec allows having both maximum and exclusiveMaximum.
 	if v.exclusiveMaximum != nil {
-		out.Printlnf(`if %s%s%s < %f {`, checkPointer, pointerPrefix, value, *v.exclusiveMaximum)
+		out.Printlnf(`if !(%s%s%s < %f) {`, checkPointer, pointerPrefix, value, *v.exclusiveMaximum)
 		out.Indent(1)
 		out.Printlnf(`return fmt.Errorf("field %%s must be < %%f", "%s", %f)`, fieldName, *v.exclusiveMaximum)
 		out.Indent(-1)
@@ -363,7 +363,7 @@ func (v *integerValidator) generate(out *codegen.Emitter) {
 	}
 
 	if v.minimum != nil {
-		out.Printlnf(`if %s%s%s >= %d {`, checkPointer, pointerPrefix, value, *v.minimum)
+		out.Printlnf(`if !(%s%s%s >= %d) {`, checkPointer, pointerPrefix, value, *v.minimum)
 		out.Indent(1)
 		out.Printlnf(`return fmt.Errorf("field %%s must be >= %%d", "%s", %d)`, fieldName, *v.minimum)
 		out.Indent(-1)
@@ -371,7 +371,7 @@ func (v *integerValidator) generate(out *codegen.Emitter) {
 	}
 
 	if v.maximum != nil {
-		out.Printlnf(`if %s%s%s <= %d {`, checkPointer, pointerPrefix, value, *v.maximum)
+		out.Printlnf(`if !(%s%s%s <= %d) {`, checkPointer, pointerPrefix, value, *v.maximum)
 		out.Indent(1)
 		out.Printlnf(`return fmt.Errorf("field %%s must be <= %%d", "%s", %d)`, fieldName, *v.maximum)
 		out.Indent(-1)
@@ -380,7 +380,7 @@ func (v *integerValidator) generate(out *codegen.Emitter) {
 
 	// The spec allows having both minimum and exclusiveMinimum.
 	if v.exclusiveMinimum != nil {
-		out.Printlnf(`if %s%s%s > %d {`, checkPointer, pointerPrefix, value, *v.exclusiveMinimum)
+		out.Printlnf(`if !(%s%s%s > %d) {`, checkPointer, pointerPrefix, value, *v.exclusiveMinimum)
 		out.Indent(1)
 		out.Printlnf(`return fmt.Errorf("field %%s must be > %%d", "%s", %d)`, fieldName, *v.exclusiveMinimum)
 		out.Indent(-1)
@@ -389,7 +389,7 @@ func (v *integerValidator) generate(out *codegen.Emitter) {
 
 	// The spec allows having both maximum and exclusiveMaximum.
 	if v.exclusiveMaximum != nil {
-		out.Printlnf(`if %s%s%s < %d {`, checkPointer, pointerPrefix, value, *v.exclusiveMaximum)
+		out.Printlnf(`if !(%s%s%s < %d) {`, checkPointer, pointerPrefix, value, *v.exclusiveMaximum)
 		out.Indent(1)
 		out.Printlnf(`return fmt.Errorf("field %%s must be < %%d", "%s", %d)`, fieldName, *v.exclusiveMaximum)
 		out.Indent(-1)
