@@ -42,6 +42,12 @@ func TestPaulinGoType(t *testing.T) {
 	testExamples(t, basicConfig, "./data/paulin_alias")
 }
 
+func TestPaulinMap(t *testing.T) {
+	t.Parallel()
+
+	testExamples(t, basicConfig, "./data/paulin_map")
+}
+
 func TestPaulinDuration(t *testing.T) {
 	t.Parallel()
 
