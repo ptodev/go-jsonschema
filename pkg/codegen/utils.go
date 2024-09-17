@@ -36,8 +36,34 @@ func isPointerType(t Type) bool {
 	}
 }
 
-func PrimitiveTypeFromJSONSchemaType(jsType, format string, pointer bool) (Type, error) {
+func PrimitiveTypeFromJSONSchemaType(jsType, format string, pointer bool, goType *schemas.GoType) (Type, error) {
 	var t Type
+
+	if goType != nil {
+		t = NamedType{
+			Package: &Package{
+				QualifiedName: goType.Package,
+				Imports: []Import{
+					{
+						QualifiedName: goType.Package,
+					},
+				},
+			},
+			Decl: &TypeDecl{
+				Name: goType.Name,
+			},
+		}
+
+		if pointer {
+			return WrapTypeInPointer(t), nil
+		}
+
+		return t, nil
+	}
+
+	if pointer {
+		return WrapTypeInPointer(t), nil
+	}
 
 	switch jsType {
 	case schemas.TypeNameString:

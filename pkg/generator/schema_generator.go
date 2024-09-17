@@ -456,7 +456,7 @@ func (g *schemaGenerator) generateType(t *schemas.Type, scope nameScope) (codege
 		return codegen.EmptyInterfaceType{}, nil
 
 	default:
-		cg, err := codegen.PrimitiveTypeFromJSONSchemaType(t.Type[typeIndex], t.Format, typeShouldBePointer)
+		cg, err := codegen.PrimitiveTypeFromJSONSchemaType(t.Type[typeIndex], t.Format, typeShouldBePointer, t.GoType)
 		if err != nil {
 			return nil, fmt.Errorf("invalid type %q: %w", t.Type[typeIndex], err)
 		}
@@ -831,7 +831,7 @@ func (g *schemaGenerator) generateTypeInline(t *schemas.Type, scope nameScope) (
 				return nil, nil
 			}
 
-			cg, err := codegen.PrimitiveTypeFromJSONSchemaType(t.Type[typeIndex], t.Format, typeShouldBePointer)
+			cg, err := codegen.PrimitiveTypeFromJSONSchemaType(t.Type[typeIndex], t.Format, typeShouldBePointer, t.GoType)
 			if err != nil {
 				return nil, fmt.Errorf("invalid type %q: %w", t.Type[typeIndex], err)
 			}
@@ -885,7 +885,7 @@ func (g *schemaGenerator) generateEnumType(t *schemas.Type, scope nameScope) (co
 
 	if len(t.Type) == 1 {
 		var err error
-		if enumType, err = codegen.PrimitiveTypeFromJSONSchemaType(t.Type[0], t.Format, false); err != nil {
+		if enumType, err = codegen.PrimitiveTypeFromJSONSchemaType(t.Type[0], t.Format, false, t.GoType); err != nil {
 			return nil, fmt.Errorf("invalid type %q: %w", t.Type[0], err)
 		}
 

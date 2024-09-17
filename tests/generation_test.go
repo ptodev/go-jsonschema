@@ -36,6 +36,12 @@ func TestCore(t *testing.T) {
 	testExamples(t, basicConfig, "./data/core")
 }
 
+func TestPaulinGoType(t *testing.T) {
+	t.Parallel()
+
+	testExamples(t, basicConfig, "./data/paulin_alias")
+}
+
 func TestPaulinDuration(t *testing.T) {
 	t.Parallel()
 

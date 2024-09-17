@@ -150,6 +150,7 @@ type Type struct {
 	AdditionalProperties *Type            `json:"additionalProperties,omitempty"` // Section 5.18.
 	Enum                 []interface{}    `json:"enum,omitempty"`                 // Section 5.20.
 	Type                 TypeList         `json:"type,omitempty"`                 // Section 5.21.
+	GoType               *GoType          `json:"goType,omitempty"`               // Section 5.21.
 	// RFC draft-bhutton-json-schema-01, section 10.
 	AllOf []*Type `json:"allOf,omitempty"` // Section 10.2.1.1.
 	AnyOf []*Type `json:"anyOf,omitempty"` // Section 10.2.1.2.
@@ -310,4 +311,10 @@ type GoJSONSchemaExtension struct {
 	Identifier *string  `json:"identifier,omitempty"`
 	Nillable   bool     `json:"nillable,omitempty"`
 	Imports    []string `json:"imports,omitempty"`
+}
+
+type GoType struct {
+	//TODO: Do we need an "omitempty"?
+	Name    string `json:"name,omitempty"`
+	Package string `json:"package,omitempty"`
 }
