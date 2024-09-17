@@ -138,14 +138,14 @@ func (v *defaultValidator) generate(out *codegen.Emitter, format string) {
 		defaultValue := "defaultDuration"
 		goDurationStr := duration.ToTimeDuration().String()
 
+		//TODO: Attempt a time.ParseDuration and if it fails, return an error.
+
 		out.Printlnf(`if v, ok := %s["%s"]; !ok || v == nil {`, varNameRawMap, v.jsonName)
 		out.Indent(1)
 		out.Printlnf("%s, err := time.ParseDuration(\"%s\")", defaultValue, goDurationStr)
 		out.Printlnf("if err != nil {")
 		out.Indent(1)
-		out.Printlnf("return fmt.Errorf(\"failed to parse the \\\"%s\\\" default value for field %s:%%w }\", err)", defaultDurationISO8601, v.fieldName)
-		//TODO: Which default value should we print? The ISO one or the Go one? Or both?
-		// out.Printlnf("return fmt.Errorf(\"failed to parse the \\\"%s\\\" default value for field %s:%%w }\", err)", goDurationStr, v.fieldName)
+		out.Printlnf("return fmt.Errorf(\"failed to parse the \\\"%s\\\" default value for field %s:%%w }\", err)", goDurationStr, v.jsonName)
 		out.Indent(-1)
 		out.Printlnf("}")
 
