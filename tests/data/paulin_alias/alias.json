@@ -9,6 +9,13 @@
                 "name": "String",
                 "package": "go.opentelemetry.io/collector/config/configopaque"
             }
+        },
+        "myUnsignedInt": {
+            "type": "integer",
+            "minimum": 0,
+            "goType": {
+                "name": "uint"
+            }
         }
     }
 }

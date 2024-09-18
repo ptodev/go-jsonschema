@@ -40,15 +40,20 @@ func PrimitiveTypeFromJSONSchemaType(jsType, format string, pointer bool, goType
 	var t Type
 
 	if goType != nil {
-		t = NamedType{
-			Package: &Package{
+		var pkg *Package
+		if len(goType.Package) > 0 {
+			pkg = &Package{
 				QualifiedName: goType.Package,
 				Imports: []Import{
 					{
 						QualifiedName: goType.Package,
 					},
 				},
-			},
+			}
+		}
+
+		t = NamedType{
+			Package: pkg,
 			Decl: &TypeDecl{
 				Name: goType.Name,
 			},

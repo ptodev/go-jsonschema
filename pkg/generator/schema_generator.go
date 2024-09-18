@@ -841,7 +841,7 @@ func (g *schemaGenerator) generateTypeInline(t *schemas.Type, scope nameScope) (
 				return nil, fmt.Errorf("invalid type %q: %w", t.Type[typeIndex], err)
 			}
 
-			if ncg, ok := cg.(codegen.NamedType); ok {
+			if ncg, ok := cg.(codegen.NamedType); ok && ncg.Package != nil {
 				for _, imprt := range ncg.Package.Imports {
 					g.output.file.Package.AddImport(imprt.QualifiedName, "")
 				}
