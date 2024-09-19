@@ -36,6 +36,15 @@ func TestCore(t *testing.T) {
 	testExamples(t, basicConfig, "./data/core")
 }
 
+func TestPaulinOmitempty(t *testing.T) {
+	t.Parallel()
+
+	cfg := basicConfig
+	cfg.DisableOmitempty = true
+
+	testExamples(t, cfg, "./data/paulin_omitempty")
+}
+
 func TestPaulinDefaulter(t *testing.T) {
 	t.Parallel()
 

@@ -550,7 +550,7 @@ func (g *schemaGenerator) generateStructType(t *schemas.Type, scope nameScope) (
 
 		tags := ""
 
-		if isRequired {
+		if isRequired || g.DisableOmitempty() {
 			for _, tag := range g.config.Tags {
 				tags += fmt.Sprintf(`%s:"%s" `, tag, name)
 			}
