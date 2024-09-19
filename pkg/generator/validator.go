@@ -15,6 +15,8 @@ import (
 type validator interface {
 	generate(out *codegen.Emitter, format string)
 	desc() *validatorDesc
+	generateSetDefaults(out *codegen.Emitter)
+	generateValidate(out *codegen.Emitter)
 }
 
 type packageImport struct {
@@ -58,6 +60,12 @@ func (v *requiredValidator) desc() *validatorDesc {
 		hasError:        true,
 		beforeUnmarshal: true,
 	}
+}
+
+func (v *requiredValidator) generateSetDefaults(out *codegen.Emitter) {
+}
+
+func (v *requiredValidator) generateValidate(out *codegen.Emitter) {
 }
 
 type nullTypeValidator struct {
@@ -104,6 +112,12 @@ func (v *nullTypeValidator) desc() *validatorDesc {
 		hasError:        true,
 		beforeUnmarshal: false,
 	}
+}
+
+func (v *nullTypeValidator) generateSetDefaults(out *codegen.Emitter) {
+}
+
+func (v *nullTypeValidator) generateValidate(out *codegen.Emitter) {
 }
 
 type defaultValidator struct {
@@ -172,7 +186,37 @@ func (v *defaultValidator) dumpDefaultValue(out *codegen.Emitter) any {
 		if ok {
 			namedFields := ""
 			for _, k := range sortedKeys(dvm) {
-				namedFields += fmt.Sprintf("\n%s: %s,", upperFirst(k), litter.Sdump(dvm[k]))
+				if interfaceSlice, ok := dvm[k].([]interface{}); ok {
+					arrayItems := nt.Decl.SchemaType.Properties[k].Items
+
+					if arrayItems == nil {
+						//TODO: Code reuse
+						namedFields += fmt.Sprintf("\n%s: %s,", upperFirst(k), litter.Sdump(dvm[k]))
+						continue
+					}
+
+					namedFields += fmt.Sprintf("\n%s: []", upperFirst(k))
+
+					//TODO: Handle a list of types.
+					//TODO: Handle the goType config entry.
+					switch arrayItems.Type[0] {
+					case "string":
+						namedFields += "string"
+					case "integer":
+						namedFields += "int"
+					case "number":
+						namedFields += "float"
+					default:
+						//TODO: Throw error?
+					}
+
+					sliceContents := litter.Sdump(interfaceSlice)
+					sliceContents = strings.TrimPrefix(sliceContents, "[]interface {}")
+
+					namedFields += fmt.Sprintf("%s,", sliceContents)
+				} else {
+					namedFields += fmt.Sprintf("\n%s: %s,", upperFirst(k), litter.Sdump(dvm[k]))
+				}
 			}
 
 			namedFields += "\n"
@@ -232,6 +276,14 @@ func (v *defaultValidator) desc() *validatorDesc {
 		beforeUnmarshal: false,
 		imports:         packages,
 	}
+}
+
+func (v *defaultValidator) generateSetDefaults(out *codegen.Emitter) {
+	defaultValue := v.dumpDefaultValue(out)
+	out.Printlnf(`%s.%s = %s`, varNameStructPtr, v.fieldName, defaultValue)
+}
+
+func (v *defaultValidator) generateValidate(out *codegen.Emitter) {
 }
 
 type arrayValidator struct {
@@ -296,6 +348,12 @@ func (v *arrayValidator) desc() *validatorDesc {
 	}
 }
 
+func (v *arrayValidator) generateSetDefaults(out *codegen.Emitter) {
+}
+
+func (v *arrayValidator) generateValidate(out *codegen.Emitter) {
+}
+
 type stringValidator struct {
 	jsonName   string
 	fieldName  string
@@ -344,6 +402,12 @@ func (v *stringValidator) desc() *validatorDesc {
 	}
 }
 
+func (v *stringValidator) generateSetDefaults(out *codegen.Emitter) {
+}
+
+func (v *stringValidator) generateValidate(out *codegen.Emitter) {
+}
+
 type anyOfValidator struct {
 	fieldName string
 	elemCount int
@@ -389,4 +453,10 @@ func lowerFirst(s string) string {
 
 func upperFirst(s string) string {
 	return strings.ToUpper(s[:1]) + s[1:]
+}
+
+func (v *anyOfValidator) generateSetDefaults(out *codegen.Emitter) {
+}
+
+func (v *anyOfValidator) generateValidate(out *codegen.Emitter) {
 }

@@ -36,6 +36,12 @@ func TestCore(t *testing.T) {
 	testExamples(t, basicConfig, "./data/core")
 }
 
+func TestPaulinDefaulter(t *testing.T) {
+	t.Parallel()
+
+	testExamples(t, basicConfig, "./data/paulin_defaulter")
+}
+
 func TestPaulinGoType(t *testing.T) {
 	t.Parallel()
 
@@ -55,6 +61,7 @@ func TestPaulinDuration(t *testing.T) {
 	// * no "default"
 	// * "default" set to ""
 	// * with a "default"
+	// * with an invalid duration format
 	testExamples(t, basicConfig, "./data/core/duration")
 }
 
